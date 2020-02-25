@@ -6,12 +6,12 @@ final class MenuRootView: UIView {
 
     struct DisplayModel {
         let items: [Item]
-        let title: String
-        let action: (Action) -> Void
         struct Item {
             let displayModel: MenuCell.DiplayModel
             let tapAction: () -> Void
         }
+        let title: String
+        let action: (Action) -> Void
         enum Action {
             case close
             case openCart
@@ -20,7 +20,7 @@ final class MenuRootView: UIView {
 
     //MARK: - Model
     
-    private var model: DisplayModel! {
+    private var model: DisplayModel? {
         didSet {
             updateViews()
         }
@@ -53,8 +53,6 @@ final class MenuRootView: UIView {
         closeButton.setTitle("Close", for: .normal)
         closeButton.addTarget(self, action: #selector(closeDidTap), for: .touchUpInside)
 
-        self.backgroundColor = UIColor.white
-
         [titleLabel, tableView, bottomButton, closeButton].forEach {
             addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -76,17 +74,22 @@ final class MenuRootView: UIView {
             bottomButton.heightAnchor.constraint(equalToConstant: 60),
 
             closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            closeButton.topAnchor.constraint(equalTo: topAnchor, constant: 16)
+            closeButton.topAnchor.constraint(equalTo: topAnchor, constant: 18)
         ])
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(UINib(nibName: "MenuCell", bundle: nil), forCellReuseIdentifier: "cell")
+
+        self.backgroundColor = UIColor.white
+
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.register(UINib(nibName: "MenuCell", bundle: nil), forCellReuseIdentifier: "cell")
+
+        self.titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
     }
 
     //MARK: - Private
     
     private func updateViews() {
+        guard let model = self.model else { return }
         self.titleLabel.text = model.title
         self.tableView.reloadData()
     }
@@ -94,11 +97,11 @@ final class MenuRootView: UIView {
     //MARK: - Actions
 
     @objc private func bottomButtonDidTap() {
-        self.model.action(.openCart)
+        self.model?.action(.openCart)
     }
 
     @objc private func closeDidTap() {
-        self.model.action(.close)
+        self.model?.action(.close)
     }
 }
 
@@ -114,18 +117,21 @@ extension MenuRootView: Configurable {
 
 extension MenuRootView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let model = self.model else { return UITableViewCell() }
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! MenuCell
-        let item = self.model.items[indexPath.row]
+        let item = model.items[indexPath.row]
         cell.configure(item.displayModel)
         return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        self.model.items.count
+        guard let model = self.model else { return 0 }
+        return model.items.count
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let item = self.model.items[indexPath.row]
+        guard let model = self.model else { return }
+        let item = model.items[indexPath.row]
         item.tapAction()
         tableView.deselectRow(at: indexPath, animated: true)
     }

@@ -11,12 +11,10 @@ final class MenuViewController: UIViewController, ViewSpecificController {
 
     var presenter: MenuPresenter!
 
-    //MARK: - Model
+    //MARK: - Input
 
-    var displayModel: DisplayModel! {
-        didSet {
-            self.view().configure(displayModel)
-        }
+    func setDisplayModel(_ model: DisplayModel) {
+        self.view().configure(model)
     }
 
     //MARK: - View managing

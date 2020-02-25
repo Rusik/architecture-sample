@@ -18,11 +18,11 @@ struct MenuModuleBuilder {
     func build() -> UIViewController {
 
         let vc = MenuViewController()
-        let presenter = MenuPresenter(city: "Moscow")
+        let presenter = MenuPresenter(city: input.city)
         let interactor = MenuInteractor()
 
         vc.presenter = presenter
-        presenter.view = vc
+        presenter.viewController = vc
         presenter.output = output
         presenter.interactor = interactor
         interactor.presenter = presenter

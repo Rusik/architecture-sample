@@ -1,0 +1,9 @@
+{
+    "products": [
+        {
+            "name": "Эспрессо",
+            "price": 90,
+            "currency": "90"
+        }
+    ]
+}
